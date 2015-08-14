@@ -70,17 +70,21 @@ public class Ideogram {
 	}
 	
 	public Collection<Ideogram> getAllComponents() {
+		return getAllComponents(true);
+	}
+	
+	public Collection<Ideogram> getAllComponents(boolean includeFirst) {
 		ArrayList<Ideogram> result = new ArrayList<>();
-		getComponentsRecursive(result);
+		getComponentsRecursive(result, includeFirst);
 		return result;
 	}
 	
-	public void getComponentsRecursive(ArrayList<Ideogram> list) {
+	public void getComponentsRecursive(ArrayList<Ideogram> list, boolean includeFirst) {
 		if(list.contains(this)) return;
-		list.add(this);
+		if(includeFirst) list.add(this);
 		if(components != null) {
 			for(Ideogram subig : components) {
-				subig.getComponentsRecursive(list);
+				subig.getComponentsRecursive(list, true);
 			}
 		}
 	}
@@ -108,6 +112,9 @@ public class Ideogram {
 	public void addComponent(Ideogram ig) {
 		if(ig == null) return;
 		if(this.equals(ig)) return;
+		if(components == null) {
+			components = new ArrayList<>();
+		}
 		
 		components.add(ig);
 		ig.parents.add(this);

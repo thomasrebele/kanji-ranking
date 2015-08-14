@@ -2,22 +2,18 @@ package kanjiranking.chise;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Map.Entry;
-
+import java.util.PriorityQueue;
 
 import kanjiranking.Data;
 import kanjiranking.chise.Ideogram.Type;
@@ -71,7 +67,6 @@ public class ChiseReader {
 		
 	void calculateComponents(Ideogram ig) {
 		if(ig.components == null) {
-			ig.components = new ArrayList<>();
 			lastDecomposition = ig.decomposition;
 			if(ig.decomposition.equals("木")) {
 				System.out.println("components of tree");
@@ -120,18 +115,16 @@ public class ChiseReader {
 				Ideogram containerig = ideogram(subig.key, ids, i);
 				containerig.type = Type.Container;
 				containerig.decomposition = subig.key;
-				containerig.components = new ArrayList<>(Arrays.asList(subig));
-				subig.parents.add(containerig);
+				containerig.addComponent(subig);;
 				components.add(containerig);
 				until = ccHelper.nextpos;
 			}
 			String name = s.substring(pos, until);
 			Ideogram parentig = ideogram(name, null, -1);
 			parentig.type = Type.Aggregate;
-			parentig.components = components;
 			parentig.decomposition = name;
 			for(Ideogram comp : components) {
-				comp.parents.add(parentig);
+				parentig.addComponent(comp);
 			}
 			return new CalcCompHelper(until, parentig);
 		}
@@ -171,6 +164,7 @@ public class ChiseReader {
 				
 				ig.decomposition = fields[2];
 				calculateComponents(ig);
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -237,43 +231,6 @@ public class ChiseReader {
 		return result;
 	}
 	
-	public class LearningRanking {
-		HashSet<Ideogram> contained = new HashSet<>();
-		ArrayList<Ideogram> list = new ArrayList<>();
-		
-		public String toString() {
-			return list.toString();
-		}
-		
-		public void add(Ideogram ig) {
-			contained.add(ig);
-			list.add(ig);
-		}
-	}
-	
-	public LearningRanking learningList(Stats stats) {
-		LearningRanking lr = new LearningRanking();
-		
-		PriorityQueue<IdeogramCount> pq = new PriorityQueue<>();
-		
-		for(IdeogramCount igc : stats.componentsByOccurences) {
-			Ideogram ig = igc.i;
-			if(lr.contained.contains(ig)) continue;
-			if(ig.components == null || ig.components.size() <= 1) {
-				lr.add(ig);
-				
-				// add parents
-				
-			}
-			else {
-				pq.add(igc);
-			}
-		}
-
-		return lr;
-	}
-	
-	
 	public static void main(String...args) {
 		String chisePath = "/home/tr/Studium/sonstiges/languages/jap/software/kanji-ranking/data/chise";
 		Path p = Paths.get(chisePath);
@@ -293,15 +250,17 @@ public class ChiseReader {
 		}*/
 		
 
-		Ideogram ig = cr.ideogram("鼻", null, -1);
+/*		Ideogram ig = cr.ideogram("鼻", null, -1);
 		System.out.println(ig.getAllComponents());
 		Ideogram ig2 = cr.ideogram("木", null, -1);
-		System.out.println(ig2.getAllComponents());
+		System.out.println(ig2.getAllComponents());*/
 
-		Stats st200 = cr.getStatistics(Data.conanKanji.substring(0, 200));
-		Stats stall = cr.getStatistics(Data.conanKanji);
-		System.out.println(cr.learningList(st200));
-		System.out.println(cr.learningList(stall));
+		//Stats st200 = cr.getStatistics(Data.conanKanji.substring(0, 200));
+		//Stats stall = cr.getStatistics(Data.conanKanji);
+		//LearningRanking lr = new LinearRanking().learningList(Data.conanKanji.substring(0,200), cr);
+		LearningRanking lr = new LinearRanking().learningList(Data.conanKanji, cr);
+		System.out.println(lr);
+		//System.out.println(cr.learningList(stall));
 		
 		// special components
 		/*for(Ideogram special : specials) {
