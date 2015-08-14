@@ -1,0 +1,2 @@
+
+Inspired by Heisig's 'Remembering the Kanji', this project aims to find frequent common components, and introduce them as primitives. In contrast, it tries to rank kanji with higher frequency first in the order, thus gaining a quicker "Return of investment" of your learning time. It relies on data from the CHISE project (http://www.chise.org/), which provides information about the decomposition of kanjis.
