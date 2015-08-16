@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class Ideogram {
+public class FontIdeogram {
 	
 	public class Image {
 		public Image(BufferedImage img) {
@@ -28,7 +28,7 @@ public class Ideogram {
 		final int height;
 	}
 	
-	public Ideogram(Character c, BufferedImage img) {
+	public FontIdeogram(Character c, BufferedImage img) {
 		this.c = c;
 		this.img = new Image(img);
 	}

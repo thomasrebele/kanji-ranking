@@ -1,4 +1,4 @@
-package playground;
+package kanjiranking.datastructures;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import playground.PeekIterator;
+import kanjiranking.datastructures.PeekIterator;
 
 public class RangeMap<V> extends AbstractMap<Character, V> 
 implements Iterable<Entry<Character, V>>, Comparable<RangeMap<V>> {

@@ -14,7 +14,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import playground.RangeTrieMap;
+import kanjiranking.datastructures.RangeTrieMap;
 
 public class KanjiVGDependency {
 	

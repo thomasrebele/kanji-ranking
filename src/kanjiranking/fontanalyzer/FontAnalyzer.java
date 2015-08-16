@@ -26,9 +26,9 @@ public class FontAnalyzer {
 		return img.getGraphics().getFont();
 	}
 	
-	public Ideogram ideogram(Character c) {
+	public FontIdeogram fontIdeogram(Character c) {
 		BufferedImage img0 = textToImage("" + c);
-		Ideogram i0 = new Ideogram(c, img0);
+		FontIdeogram i0 = new FontIdeogram(c, img0);
 		return i0;
 	}
 	

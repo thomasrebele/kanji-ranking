@@ -1,4 +1,4 @@
-package playground;
+package kanjiranking.datastructures;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import playground.PeekIterator;
+import kanjiranking.datastructures.PeekIterator;
 
 public class RangeTrieMap<V> implements Map<CharSequence, V> {
 	private Map<Character, RangeTrieMap<V>> subtries;

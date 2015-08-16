@@ -1,4 +1,4 @@
-package playground;
+package kanjiranking.datastructures;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import playground.PeekIterator;
+import kanjiranking.datastructures.PeekIterator;
 
 public class MultiRangeMap<V> extends AbstractMap<Character, V> {
 
