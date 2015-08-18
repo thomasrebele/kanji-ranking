@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
-public class LearningRanking {
+public class Ranking {
 	public HashSet<Ideogram> contained = new HashSet<>();
 	public ArrayList<Ideogram> list = new ArrayList<>();
+
+	public HashMap<Ideogram, String> ideogramInfo = null;
 
 	@Override
 	public String toString() {
@@ -22,12 +25,12 @@ public class LearningRanking {
 		}
 	}
 
-	public static LearningRanking readFromFile(String file) {
-		return readFromFile(file, new ChiseReader());
+	public static Ranking readFromFile(String file) {
+		return readFromFile(new Ranking(), file, new ChiseReader());
 	}
 
-	public static LearningRanking readFromFile(String file, ChiseReader cr) {
-		LearningRanking lr = new LearningRanking();
+	public static Ranking readFromFile(Ranking lr, String file, ChiseReader cr) {
+		lr.ideogramInfo = new HashMap<>();
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
 			String line = null;
@@ -42,6 +45,8 @@ public class LearningRanking {
 
 				Ideogram ig = cr.parseIdeogram(fields[0]);
 				lr.add(ig);
+
+				lr.ideogramInfo.put(ig, line);
 			}
 
 		} catch (IOException e) {

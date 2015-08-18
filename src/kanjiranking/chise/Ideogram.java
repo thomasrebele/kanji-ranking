@@ -115,19 +115,21 @@ public class Ideogram {
 		}
 	}
 
-	public Collection<Ideogram> getAllParents() {
+	public List<Ideogram> getParents(int maxRecursionDepth) {
 		ArrayList<Ideogram> result = new ArrayList<>();
-		getAllParentsRecursive(result);
+		getAllParentsRecursive(result, maxRecursionDepth);
 		return result;
 	}
 
-	public void getAllParentsRecursive(ArrayList<Ideogram> list) {
+	public void getAllParentsRecursive(ArrayList<Ideogram> list, int maxRecursionDepth) {
+		if (maxRecursionDepth < 0)
+			return;
 		if (list.contains(this))
 			return;
 		list.add(this);
 		if (parents != null) {
 			for (Ideogram parent : parents) {
-				parent.getAllParentsRecursive(list);
+				parent.getAllParentsRecursive(list, maxRecursionDepth - 1);
 			}
 		}
 	}
@@ -136,8 +138,16 @@ public class Ideogram {
 		return parents;
 	}
 
-	public Collection<Ideogram> getAllParents(Type type) {
-		return getAllParents().stream().filter(i -> i.type == Type.Unicode).collect(Collectors.toList());
+	public List<Ideogram> getAllParents(Type type) {
+		return getAllParents(type, Integer.MAX_VALUE);
+	}
+
+	public List<Ideogram> getAllParents(Type type, int maxRecursionDepth) {
+		return getParents(maxRecursionDepth).stream().filter(i -> i.type == Type.Unicode).collect(Collectors.toList());
+	}
+
+	public Collection<Ideogram> getAllParents() {
+		return getParents(Integer.MAX_VALUE);
 	}
 
 	public void addComponent(Ideogram ig) {

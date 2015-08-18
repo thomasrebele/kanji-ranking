@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +23,9 @@ public class KoohiiReader {
 
 		@Override
 		public String toString() {
-			return character + ", " + keyword + (primitive != null ? "(" + primitive + ")" : "") + ": " + story;
+			return character + ", " + (keyword != null ? keyword : "")
+					+ (keyword != null && primitive != null ? " " : "")
+					+ (primitive != null ? "(" + primitive + ")" : "") + ": " + story;
 		}
 	}
 
@@ -40,8 +43,10 @@ public class KoohiiReader {
 		try (CSVReader reader = new CSVReader(new FileReader(file))) {
 			String[] fields;
 			while ((fields = reader.readNext()) != null) {
+				if (fields.length <= 1)
+					continue;
 				if (fields.length != 6) {
-					System.out.println("Warning: wrong number of elements in line " + fields);
+					System.out.println("Warning: wrong number of elements in line " + Arrays.toString(fields));
 					continue;
 				}
 
@@ -87,9 +92,19 @@ public class KoohiiReader {
 					ke.primitive = arg;
 				} else {
 					KoohiiEntry primitive = new KoohiiEntry();
-					primitive.character = arg.substring(0, splitpos);
-					primitive.index = primitive.character;
+					String firstPart = arg.substring(0, splitpos).trim();
 					primitive.story = arg.substring(splitpos + 1).trim();
+
+					splitpos = firstPart.indexOf("|");
+					if (splitpos < 0) {
+						primitive.primitive = firstPart;
+						primitive.character = firstPart;
+						primitive.index = primitive.character;
+					} else {
+						primitive.primitive = firstPart.substring(splitpos + 1).trim();
+						primitive.character = firstPart.substring(0, splitpos).trim();
+						primitive.index = primitive.primitive;
+					}
 					add(primitive);
 				}
 
@@ -104,16 +119,16 @@ public class KoohiiReader {
 		ke.story = story.toString().trim();
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		String file = "/home/tr/Studium/sonstiges/languages/jap/kanji.koohii.com/my_stories.csv";
-
+	
 		KoohiiReader kr = readFromFile(file);
-
+	
 		// System.out.println(kr.entries);
 		for (int i = 0; i < kr.entries.size(); i++) {
 			KoohiiEntry ke = kr.entries.get(i);
 			System.out.println(ke.character);
 		}
-	}
+	}*/
 
 }

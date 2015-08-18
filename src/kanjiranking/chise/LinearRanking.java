@@ -1,8 +1,8 @@
 package kanjiranking.chise;
 
 public class LinearRanking {
-	public LearningRanking learningList(String kanji, ChiseReader cr) {
-		LearningRanking lr = new LearningRanking();
+	public Ranking learningList(String kanji, ChiseReader cr) {
+		Ranking lr = new Ranking();
 
 		for (int i = 0; i < kanji.length(); i++) {
 			Ideogram ig = cr.ideogram("" + kanji.charAt(i), null, -1);
@@ -12,7 +12,7 @@ public class LinearRanking {
 		return lr;
 	}
 
-	public void addRecursive(LearningRanking lr, Ideogram ig, ChiseReader cr) {
+	public void addRecursive(Ranking lr, Ideogram ig, ChiseReader cr) {
 		if (lr.contained.contains(ig))
 			return;
 		if (ig.components != null) {

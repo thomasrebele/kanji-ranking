@@ -1,6 +1,10 @@
 package kanjiranking;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -13,8 +17,8 @@ import kanjiranking.CharCount.CharStat;
 import kanjiranking.chise.ChiseReader;
 import kanjiranking.chise.Ideogram;
 import kanjiranking.chise.Ideogram.Type;
-import kanjiranking.chise.LearningRanking;
 import kanjiranking.chise.LinearRanking;
+import kanjiranking.chise.Ranking;
 
 public class Main {
 	public static void main(String... args) {
@@ -24,51 +28,49 @@ public class Main {
 
 		File[] files = p.toFile().listFiles();
 		for (File f : files) {
-			if (f.getName().equals("IDS-UCS-Basic.txt") || f.getName().equals("userdefined.txt")) {
+			if (f.getName().equals("IDS-UCS-Basic.txt")) {
 				// if (f.getName().equals("test.txt")) {
 				cr.readFile(f);
 				// System.out.println(f);
 			}
 		}
-		// list of components
-		/*
-		 * for(Entry<Ideogram, Integer> ig : componentCount.entrySet()) {
-		 * System.out.println(ig); }
-		 */
 
-		/*
-		 * Ideogram ig = cr.ideogram("鼻", null, -1);
-		 * System.out.println(ig.getAllComponents()); Ideogram ig2 =
-		 * cr.ideogram("木", null, -1);
-		 * System.out.println(ig2.getAllComponents());
-		 */
+		cr.readFile(new File(dataPath + "userdefined.txt"));
 
-		// Stats st200 = cr.getStatistics(Data.conanKanji.substring(0, 200));
-		// Stats stall = cr.getStatistics(Data.conanKanji);
-		// LearningRanking lr = new
-		// LinearRanking().learningList(Data.conanKanji.substring(0,200), cr);
-		LearningRanking lr = new LinearRanking().learningList(Data.conanKanji.substring(0), cr);
-		// System.out.println(lr);
-		// System.out.println(cr.learningList(stall));
+		/*{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String line = null;
+			try {
+				while ((line = br.readLine()) != null) {
+					line = line.trim();
+					Ideogram ig = cr.ideogram(line);
+					if (ig == null) {
+						System.out.println("ideogram '" + line + "' not found");
+					} else {
+						System.out.println(ig.getAllComponents());
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}*/
+
+		Ranking lr = new LinearRanking().learningList(Data.conanKanji.substring(0), cr);
 
 		CharCount csKanji = CharCount.readFromFile(Paths.get(dataPath + "wiki/wikipedia-kanji-frequency.txt").toFile());
 		HashMap<Ideogram, CharStat> compStatsKanji = calculateComponentStat(cr, csKanji);
 
-		/*Ideogram ig = cr.ideogram("可", cr.idschar("⿰"), 1);
-		System.out.println(ig);
-		{
-			CharStat compStat = compStatsKanji.get(ig);
-			System.out.println(compStat + " char count " + (compStat == null ? "" : compStat.other));
-		}*/
-
 		CharCount csHanzi = CharCount.readFromFile(Paths.get(dataPath + "wiki/wikipedia-hanzi-frequency.txt").toFile());
 		HashMap<Ideogram, CharStat> compStatsHanzi = calculateComponentStat(cr, csHanzi);
 
-		/*System.out.println(ig);
-		{
-			CharStat compStat = compStatsHanzi.get(ig);
-			System.out.println(compStat + " char count " + (compStat == null ? "" : compStat.other));
-		}*/
+		OutputStreamWriter normal = new OutputStreamWriter(System.out);
+		OutputStreamWriter combined = null;
+		try {
+			combined = new OutputStreamWriter(
+					new FileOutputStream(dataPath + "kanji.koohii.com/ignore_components.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		System.out.println("character\tkanji_frequency\tparent_count\thanzi_frequency\tparent_count");
 		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
@@ -94,21 +96,27 @@ public class Main {
 				line.append(igPure.toString());
 				appendStats(compStatsKanji, df, igPure, line);
 				appendStats(compStatsHanzi, df, igPure, line);
+			} else if (ig.getType() == Type.Unicode || ig.getType() == Type.Special) {
+				line.append("\t");
+				line.append(ig.getAllComponents(false));
+				line.append("\t");
+				List<Ideogram> parents = ig.getAllParents(Type.Unicode, 3);
+				if (parents.size() > 10) {
+					parents = parents.subList(0, 10);
+				}
+				line.append(parents);
 			}
 
-			System.out.println(line);
+			if (ig.getType() == Type.Aggregate || ig.getType() == Type.Container) {
+				try {
+					combined.write(line + "\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println(line);
+			}
 		}
-
-		// System.out.println(compStatsKanji.get(cr.parseIdeogram("⿸_奄")));
-		// System.out.println(compStatsKanji.get(cr.parseIdeogram("⿳𠂉__")));
-		// special components
-		/*
-		 * for(Ideogram special : specials) { Collection<Ideogram> parents =
-		 * special.getAllParents(Type.Unicode); if(parents.isEmpty()) { parents
-		 * = special.getAllParents(); } System.out.println(special + " " +
-		 * parents); } System.out.println("special characters " +
-		 * specials.size());
-		 */
 
 		//
 	}
@@ -137,8 +145,8 @@ public class Main {
 				double ratio = (double) cs.getCount() / csPure.getCount();
 				// System.out.println(cs + " " + csPure + " ratio " +
 				// ratio);
-				if (csPure.getCount() < 5 || ratio < 0.15 || (1 - ratio) < 0.15)
-					skip = true;
+				/*if (csPure.getCount() < 5 || ratio < 0.15 || (1 - ratio) < 0.15)
+					skip = true;*/
 
 				/*if (ratio == 1)
 					skip = false;*/

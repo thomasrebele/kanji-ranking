@@ -6,8 +6,8 @@ import kanjiranking.chise.ChiseReader.IdeogramCount;
 import kanjiranking.chise.ChiseReader.Stats;
 
 public class DAGRanking {
-	public LearningRanking learningList(Stats stats) {
-		LearningRanking lr = new LearningRanking();
+	public Ranking learningList(Stats stats) {
+		Ranking lr = new Ranking();
 		DAG<Ideogram> dag = new DAG<>();
 
 		int i=0;
