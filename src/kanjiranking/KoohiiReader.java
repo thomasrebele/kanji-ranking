@@ -23,9 +23,17 @@ public class KoohiiReader {
 
 		@Override
 		public String toString() {
+			return toShortString();
+		}
+
+		public String toShortString() {
 			return character + ", " + (keyword != null ? keyword : "")
 					+ (keyword != null && primitive != null ? " " : "")
-					+ (primitive != null ? "(" + primitive + ")" : "") + ": " + story;
+					+ (primitive != null ? "(" + primitive + ")" : "");
+		}
+
+		public String toLongString() {
+			return toShortString() + ": " + story;
 		}
 	}
 
@@ -121,9 +129,9 @@ public class KoohiiReader {
 
 	/*public static void main(String[] args) {
 		String file = "/home/tr/Studium/sonstiges/languages/jap/kanji.koohii.com/my_stories.csv";
-	
+
 		KoohiiReader kr = readFromFile(file);
-	
+
 		// System.out.println(kr.entries);
 		for (int i = 0; i < kr.entries.size(); i++) {
 			KoohiiEntry ke = kr.entries.get(i);

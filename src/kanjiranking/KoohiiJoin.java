@@ -22,9 +22,12 @@ public class KoohiiJoin {
 		KoohiiReader.readFromFile(kr, koohiiPath + "my_stories.csv");
 		KoohiiReader.readFromFile(kr, koohiiPath + "my_stories_add.csv");
 
-		Ranking lr = Ranking.readFromFile(rankingFile);
-		Ranking ignore = Ranking.readFromFile(ignoreFile + "ignore.txt");
-		Ranking.readFromFile(ignore, ignoreFile + "ignore_permanent.txt", new ChiseReader());
+		ChiseReader cr = Main.loadChiseReader();
+		Ranking lr = new Ranking();
+		Ranking.readFromFile(lr, rankingFile, cr);
+		Ranking ignore = new Ranking();
+		Ranking.readFromFile(ignore, ignoreFile + "ignore.txt", cr);
+		Ranking.readFromFile(ignore, ignoreFile + "ignore_permanent.txt", cr);
 
 		// System.out.println(kr.map.get("⿱甫寸"));
 
@@ -32,7 +35,7 @@ public class KoohiiJoin {
 		try {
 			CSVWriter writer = new CSVWriter(new OutputStreamWriter(System.out));
 			OutputStreamWriter leftoverWriter = new OutputStreamWriter(System.err);
-			String[] header = { "character", "index", "keyword", "primitive", "story", "notes" };
+			String[] header = { "character", "index", "keyword", "primitive", "story", "parts", "notes" };
 			writer.writeNext(header);
 			for (Ideogram ig : lr.list) {
 				if (ignore.contained.contains(ig)) {
@@ -40,17 +43,30 @@ public class KoohiiJoin {
 				}
 				KoohiiEntry ke = kr.map.get(ig.toString());
 
-				String[] fields = new String[6];
+				String[] fields = new String[7];
 				if (ke != null) {
 					fields[0] = ke.character;
 					fields[1] = "" + (idx++);
 					fields[2] = ke.keyword;
 					fields[3] = ke.primitive;
 					fields[4] = ke.story;
-					fields[5] = "heisig-index: none";
+
+					StringBuilder decomp = new StringBuilder();
+					for (Ideogram subig : ig.getAllComponents(false)) {
+						KoohiiEntry subke = kr.map.get(subig.toString());
+						if (subke != null) {
+							if (decomp.length() != 0) {
+								decomp.append("; ");
+							}
+							decomp.append(subke.toShortString());
+						}
+					}
+					fields[5] = decomp.toString();
+
+					fields[6] = "heisig-index: none";
 					try {
 						if (("" + Integer.parseInt(ke.index)).equals(ke.index)) {
-							fields[5] = "heisig-index: " + ke.index;
+							fields[6] = "heisig-index: " + ke.index;
 						}
 					} catch (NumberFormatException e) {
 

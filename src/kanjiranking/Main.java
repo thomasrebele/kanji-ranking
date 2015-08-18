@@ -21,7 +21,8 @@ import kanjiranking.chise.LinearRanking;
 import kanjiranking.chise.Ranking;
 
 public class Main {
-	public static void main(String... args) {
+
+	public static ChiseReader loadChiseReader() {
 		String dataPath = "/home/tr/Studium/sonstiges/languages/jap/software/kanji-ranking/data/";
 		Path p = Paths.get(dataPath + "chise");
 		ChiseReader cr = new ChiseReader();
@@ -35,7 +36,13 @@ public class Main {
 			}
 		}
 
-		cr.readFile(new File(dataPath + "userdefined.txt"));
+		cr.readFile(new File(dataPath + "/kanji.koohii.com/userdefined_decomposition.txt"));
+		return cr;
+	}
+
+	public static void main(String... args) {
+		String dataPath = "/home/tr/Studium/sonstiges/languages/jap/software/kanji-ranking/data/";
+		ChiseReader cr = loadChiseReader();
 
 		/*{
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
