@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.IntStream;
 
 public class Ranking {
 	public HashSet<Ideogram> contained = new HashSet<>();
@@ -23,6 +24,13 @@ public class Ranking {
 			contained.add(ig);
 			list.add(ig);
 		}
+	}
+
+	public static Ranking readFromString(String str, ChiseReader cr) {
+		Ranking result = new Ranking();
+		IntStream is = str.codePoints();
+		is.forEach(i -> result.add(cr.ideogram(new String(Character.toChars(i)))));
+		return result;
 	}
 
 	public static Ranking readFromFile(String file) {

@@ -165,6 +165,7 @@ public class ChiseReader {
 				}
 
 				ig.decomposition = fields[2];
+				ig.components = null;
 				calculateComponents(ig);
 
 			}
